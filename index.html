@@ -21,9 +21,6 @@
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             cursor: pointer;
         }
         .slider-container {
@@ -71,14 +68,20 @@
             x += velocityX;
             y += velocityY;
             
-            if (x <= 0 || x + 100 >= window.innerWidth) {
+            if (x <= 0) {
                 velocityX *= -(1 - damping);
-                x = Math.max(0, Math.min(x, window.innerWidth - 100));
+                x = 0;
+            } else if (x + 100 >= window.innerWidth) {
+                velocityX *= -(1 - damping);
+                x = window.innerWidth - 100;
             }
             
-            if (y <= 0 || y + 100 >= window.innerHeight) {
+            if (y <= 0) {
                 velocityY *= -(1 - damping);
-                y = Math.max(0, Math.min(y, window.innerHeight - 100));
+                y = 0;
+            } else if (y + 100 >= window.innerHeight) {
+                velocityY *= -(1 - damping);
+                y = window.innerHeight - 100;
             }
             
             circle.style.left = x + "px";
@@ -86,6 +89,11 @@
             
             requestAnimationFrame(bounce);
         }
+        
+        window.addEventListener('resize', () => {
+            x = Math.max(0, Math.min(x, window.innerWidth - 100));
+            y = Math.max(0, Math.min(y, window.innerHeight - 100));
+        });
     </script>
 </body>
 </html>
