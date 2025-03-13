@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Changing Bouncing Circle</title>
+    <title>Real-Time Bouncing Circle</title>
     <style>
         body {
             margin: 0;
@@ -40,6 +40,7 @@
         <input type="range" id="dampingSlider" min="0" max="0.5" step="0.01" value="0.05">
     </div>
     <script>
+        const socket = new WebSocket('ws://localhost:8080');
         let isMoving = false;
         let x = window.innerWidth / 2;
         let y = window.innerHeight / 2;
@@ -47,6 +48,15 @@
         let velocityY = (Math.random() - 0.5) * 10;
         let gravity = 0.5;
         
+        socket.onmessage = (event) => {
+            let data = JSON.parse(event.data);
+            x = data.x;
+            y = data.y;
+            velocityX = data.velocityX;
+            velocityY = data.velocityY;
+            updateBallPosition();
+        };
+
         function getRandomColor() {
             return `hsl(${Math.random() * 360}, 70%, 60%)`;
         }
@@ -87,8 +97,8 @@
             if (Math.abs(velocityX) < 0.1) velocityX = 0;
             if (Math.abs(velocityY) < 0.1) velocityY = 0;
             
-            circle.style.left = x + "px";
-            circle.style.top = y + "px";
+            updateBallPosition();
+            socket.send(JSON.stringify({ x, y, velocityX, velocityY }));
             
             if (velocityX !== 0 || velocityY !== 0) {
                 requestAnimationFrame(bounce);
@@ -96,7 +106,13 @@
                 isMoving = false;
             }
         }
-        
+
+        function updateBallPosition() {
+            let circle = document.getElementById("circle");
+            circle.style.left = x + "px";
+            circle.style.top = y + "px";
+        }
+
         window.addEventListener('resize', () => {
             x = Math.max(0, Math.min(x, window.innerWidth - 100));
             y = Math.max(0, Math.min(y, window.innerHeight - 100));
