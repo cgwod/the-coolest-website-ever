@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Changing Circle</title>
+    <title>Color Changing Falling Circle</title>
     <style>
         body {
             margin: 0;
@@ -12,6 +12,8 @@
             align-items: center;
             height: 100vh;
             transition: background-color 0.5s ease;
+            overflow: hidden;
+            position: relative;
         }
         .circle {
             width: 100px;
@@ -23,17 +25,49 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
         }
     </style>
 </head>
 <body>
-    <div class="circle" onclick="changeBackgroundColor()"></div>
+    <div class="circle" id="circle" onclick="handleClick()"></div>
     <script>
+        let clicked = false;
+        let velocity = 0;
+        let gravity = 0.5;
+        let y = window.innerHeight / 2;
+        let isFalling = false;
+        
         function getRandomColor() {
             return `hsl(${Math.random() * 360}, 70%, 60%)`;
         }
-        function changeBackgroundColor() {
+        
+        function handleClick() {
             document.body.style.backgroundColor = getRandomColor();
+            
+            if (!clicked) {
+                isFalling = true;
+                clicked = true;
+                fall();
+            }
+        }
+        
+        function fall() {
+            if (!isFalling) return;
+            let circle = document.getElementById("circle");
+            velocity += gravity;
+            y += velocity;
+            
+            if (y + 50 >= window.innerHeight) { // Stops at bottom
+                y = window.innerHeight - 50;
+                velocity *= -0.6; // Bounce effect
+                if (Math.abs(velocity) < 1) velocity = 0; // Stop small bounces
+            }
+            
+            circle.style.top = y + "px";
+            requestAnimationFrame(fall);
         }
     </script>
 </body>
