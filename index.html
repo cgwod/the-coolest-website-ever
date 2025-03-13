@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Changing Falling Circle</title>
+    <title>Color Changing Bouncing Circle</title>
     <style>
         body {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            transition: background-color 0.5s ease;
             overflow: hidden;
             position: relative;
+            height: 100vh;
+            width: 100vw;
+            background-color: white;
+            transition: background-color 0.5s ease;
         }
         .circle {
             width: 100px;
@@ -21,53 +20,59 @@
             background-color: white;
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="circle" id="circle" onclick="handleClick()"></div>
+    <div class="circle" id="circle" onclick="startBouncing()"></div>
     <script>
-        let clicked = false;
-        let velocity = 0;
-        let gravity = 0.5;
+        let isMoving = false;
+        let x = window.innerWidth / 2;
         let y = window.innerHeight / 2;
-        let isFalling = false;
-        
+        let velocityX = (Math.random() - 0.5) * 10;
+        let velocityY = (Math.random() - 0.5) * 10;
+        let gravity = 0.5;
+        let friction = 0.99;
+
         function getRandomColor() {
             return `hsl(${Math.random() * 360}, 70%, 60%)`;
         }
-        
-        function handleClick() {
+
+        function startBouncing() {
             document.body.style.backgroundColor = getRandomColor();
-            
-            if (!clicked) {
-                isFalling = true;
-                clicked = true;
-                fall();
+            if (!isMoving) {
+                isMoving = true;
+                bounce();
             }
         }
-        
-        function fall() {
-            if (!isFalling) return;
+
+        function bounce() {
+            if (!isMoving) return;
             let circle = document.getElementById("circle");
-            velocity += gravity;
-            y += velocity;
             
-            if (y + 50 >= window.innerHeight) { // Stops at bottom
-                y = window.innerHeight - 50;
-                velocity *= -0.6; // Bounce effect
-                if (Math.abs(velocity) < 1) velocity = 0; // Stop small bounces
+            velocityY += gravity;
+            x += velocityX;
+            y += velocityY;
+            
+            if (x <= 0 || x + 100 >= window.innerWidth) {
+                velocityX *= -friction;
+                x = Math.max(0, Math.min(x, window.innerWidth - 100));
             }
             
+            if (y + 100 >= window.innerHeight) {
+                velocityY *= -friction;
+                y = window.innerHeight - 100;
+            }
+            
+            circle.style.left = x + "px";
             circle.style.top = y + "px";
-            requestAnimationFrame(fall);
+            
+            requestAnimationFrame(bounce);
         }
     </script>
 </body>
