@@ -37,7 +37,7 @@
     <div class="circle" id="circle" onclick="startBouncing()"></div>
     <div class="slider-container">
         <label for="dampingSlider">Damping:</label>
-        <input type="range" id="dampingSlider" min="0" max="0.2" step="0.01" value="0.05">
+        <input type="range" id="dampingSlider" min="0" max="0.5" step="0.01" value="0.05">
     </div>
     <script>
         let isMoving = false;
@@ -84,10 +84,17 @@
                 y = window.innerHeight - 100;
             }
             
+            if (Math.abs(velocityX) < 0.1) velocityX = 0;
+            if (Math.abs(velocityY) < 0.1) velocityY = 0;
+            
             circle.style.left = x + "px";
             circle.style.top = y + "px";
             
-            requestAnimationFrame(bounce);
+            if (velocityX !== 0 || velocityY !== 0) {
+                requestAnimationFrame(bounce);
+            } else {
+                isMoving = false;
+            }
         }
         
         window.addEventListener('resize', () => {
