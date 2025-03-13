@@ -26,10 +26,22 @@
             transform: translate(-50%, -50%);
             cursor: pointer;
         }
+        .slider-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="circle" id="circle" onclick="startBouncing()"></div>
+    <div class="slider-container">
+        <label for="dampingSlider">Damping:</label>
+        <input type="range" id="dampingSlider" min="0" max="0.2" step="0.01" value="0.05">
+    </div>
     <script>
         let isMoving = false;
         let x = window.innerWidth / 2;
@@ -37,8 +49,7 @@
         let velocityX = (Math.random() - 0.5) * 10;
         let velocityY = (Math.random() - 0.5) * 10;
         let gravity = 0.5;
-        let friction = 0.99;
-
+        
         function getRandomColor() {
             return `hsl(${Math.random() * 360}, 70%, 60%)`;
         }
@@ -54,19 +65,20 @@
         function bounce() {
             if (!isMoving) return;
             let circle = document.getElementById("circle");
+            let damping = parseFloat(document.getElementById("dampingSlider").value);
             
             velocityY += gravity;
             x += velocityX;
             y += velocityY;
             
             if (x <= 0 || x + 100 >= window.innerWidth) {
-                velocityX *= -friction;
+                velocityX *= -(1 - damping);
                 x = Math.max(0, Math.min(x, window.innerWidth - 100));
             }
             
-            if (y + 100 >= window.innerHeight) {
-                velocityY *= -friction;
-                y = window.innerHeight - 100;
+            if (y <= 0 || y + 100 >= window.innerHeight) {
+                velocityY *= -(1 - damping);
+                y = Math.max(0, Math.min(y, window.innerHeight - 100));
             }
             
             circle.style.left = x + "px";
