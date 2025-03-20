@@ -47,7 +47,6 @@
         let velocityX = 0;
         let velocityY = 0;
         let gravity = 0.5;
-        let radius = 50;
         let lastMouseX = 0;
         let lastMouseY = 0;
         let mouseX = 0;
@@ -92,6 +91,8 @@
             isDragging = true;
             lastMouseX = event.clientX;
             lastMouseY = event.clientY;
+            mouseX = event.clientX - x;
+            mouseY = event.clientY - y;
             velocityX = 0;
             velocityY = 0;
             document.getElementById("circle").style.cursor = "grabbing";
@@ -99,12 +100,8 @@
 
         window.addEventListener("mousemove", (event) => {
             if (isDragging) {
-                let dx = event.clientX - lastMouseX;
-                let dy = event.clientY - lastMouseY;
-                x += dx;
-                y += dy;
-                lastMouseX = event.clientX;
-                lastMouseY = event.clientY;
+                x = event.clientX - mouseX;
+                y = event.clientY - mouseY;
                 updateBallPosition();
             }
         });
