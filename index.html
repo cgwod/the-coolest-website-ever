@@ -49,6 +49,7 @@
         let radius = 50;
         let mouseX = 0;
         let mouseY = 0;
+        let mousePreviouslyInside = false;
 
         function getRandomColor() {
             return `hsl(${Math.random() * 360}, 70%, 60%)`;
@@ -74,12 +75,15 @@
             let distX = mouseX - (x + radius);
             let distY = mouseY - (y + radius);
             let distance = Math.sqrt(distX * distX + distY * distY);
-            if (distance <= radius) { // Only push when mouse is on the ball
+            let mouseInside = distance <= radius;
+
+            if (mouseInside && !mousePreviouslyInside) { // Apply force only when first touching
                 let angle = Math.atan2(distY, distX);
-                let force = 5; // Adjusted push force
+                let force = 5;
                 velocityX += Math.cos(angle) * force;
                 velocityY += Math.sin(angle) * force;
             }
+            mousePreviouslyInside = mouseInside;
 
             if (x <= 0 || x + 100 >= window.innerWidth) {
                 velocityX *= -(1 - damping);
