@@ -74,10 +74,10 @@
 
             updateBallPosition();
 
-            if (velocityX !== 0 || velocityY !== 0) {
-                requestAnimationFrame(bounce);
+            if (Math.abs(velocityX) > 0.1 || Math.abs(velocityY) > 0.1) {
+                requestAnimationFrame(bounce); // Keep the bounce going if there's movement
             } else {
-                isMoving = false;
+                isMoving = false; // Stop if the velocity is low enough
             }
         }
 
