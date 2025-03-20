@@ -58,7 +58,7 @@
             document.body.style.backgroundColor = getRandomColor();
             if (!isMoving) {
                 isMoving = true;
-                bounce();
+                requestAnimationFrame(bounce);
             }
         }
 
@@ -81,20 +81,14 @@
                 velocityY += Math.sin(angle) * force;
             }
 
-            if (x <= 0) {
+            if (x <= 0 || x + 100 >= window.innerWidth) {
                 velocityX *= -(1 - damping);
-                x = 0;
-            } else if (x + 100 >= window.innerWidth) {
-                velocityX *= -(1 - damping);
-                x = window.innerWidth - 100;
+                x = Math.max(0, Math.min(x, window.innerWidth - 100));
             }
 
-            if (y <= 0) {
+            if (y <= 0 || y + 100 >= window.innerHeight) {
                 velocityY *= -(1 - damping);
-                y = 0;
-            } else if (y + 100 >= window.innerHeight) {
-                velocityY *= -(1 - damping);
-                y = window.innerHeight - 100;
+                y = Math.max(0, Math.min(y, window.innerHeight - 100));
             }
 
             if (Math.abs(velocityX) < 0.1) velocityX = 0;
