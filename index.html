@@ -52,8 +52,12 @@
         let mouseX = 0;
         let mouseY = 0;
 
+        document.addEventListener("DOMContentLoaded", () => {
+            updateBallPosition();
+        });
+
         function bounce() {
-            if (isDragging) return; // Stop physics while dragging
+            if (isDragging) return;
 
             let damping = parseFloat(document.getElementById("dampingSlider").value);
             velocityY += gravity;
