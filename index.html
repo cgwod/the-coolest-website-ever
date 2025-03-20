@@ -21,7 +21,7 @@
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             position: absolute;
-            cursor: pointer;
+            cursor: grab;
         }
         .slider-container {
             position: absolute;
@@ -34,62 +34,37 @@
     </style>
 </head>
 <body>
-    <div class="circle" id="circle" onclick="startBouncing()"></div>
+    <div class="circle" id="circle"></div>
     <div class="slider-container">
         <label for="dampingSlider">Damping:</label>
         <input type="range" id="dampingSlider" min="0" max="0.5" step="0.01" value="0.05">
     </div>
     <script>
         let isMoving = false;
+        let isDragging = false;
         let x = window.innerWidth / 2;
         let y = window.innerHeight / 2;
-        let velocityX = (Math.random() - 0.5) * 10;
-        let velocityY = (Math.random() - 0.5) * 10;
+        let velocityX = 0;
+        let velocityY = 0;
         let gravity = 0.5;
         let radius = 50;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
         let mouseX = 0;
         let mouseY = 0;
-        let mousePreviouslyInside = false;
-
-        function getRandomColor() {
-            return `hsl(${Math.random() * 360}, 70%, 60%)`;
-        }
-
-        function startBouncing() {
-            document.body.style.backgroundColor = getRandomColor();
-            if (!isMoving) {
-                isMoving = true;
-                requestAnimationFrame(bounce);
-            }
-        }
 
         function bounce() {
-            if (!isMoving) return;
-            let circle = document.getElementById("circle");
-            let damping = parseFloat(document.getElementById("dampingSlider").value);
+            if (isDragging) return; // Stop physics while dragging
 
+            let damping = parseFloat(document.getElementById("dampingSlider").value);
             velocityY += gravity;
             x += velocityX;
             y += velocityY;
-
-            let distX = mouseX - (x + radius);
-            let distY = mouseY - (y + radius);
-            let distance = Math.sqrt(distX * distX + distY * distY);
-            let mouseInside = distance <= radius;
-
-            if (mouseInside && !mousePreviouslyInside) { // Apply force only when first touching
-                let angle = Math.atan2(distY, distX);
-                let force = 5;
-                velocityX += Math.cos(angle) * force;
-                velocityY += Math.sin(angle) * force;
-            }
-            mousePreviouslyInside = mouseInside;
 
             if (x <= 0 || x + 100 >= window.innerWidth) {
                 velocityX *= -(1 - damping);
                 x = Math.max(0, Math.min(x, window.innerWidth - 100));
             }
-
             if (y <= 0 || y + 100 >= window.innerHeight) {
                 velocityY *= -(1 - damping);
                 y = Math.max(0, Math.min(y, window.innerHeight - 100));
@@ -113,14 +88,43 @@
             circle.style.top = y + "px";
         }
 
+        document.getElementById("circle").addEventListener("mousedown", (event) => {
+            isDragging = true;
+            lastMouseX = event.clientX;
+            lastMouseY = event.clientY;
+            velocityX = 0;
+            velocityY = 0;
+            document.getElementById("circle").style.cursor = "grabbing";
+        });
+
+        window.addEventListener("mousemove", (event) => {
+            if (isDragging) {
+                let dx = event.clientX - lastMouseX;
+                let dy = event.clientY - lastMouseY;
+                x += dx;
+                y += dy;
+                lastMouseX = event.clientX;
+                lastMouseY = event.clientY;
+                updateBallPosition();
+            }
+        });
+
+        window.addEventListener("mouseup", (event) => {
+            if (isDragging) {
+                velocityX = (event.clientX - lastMouseX) * 0.5;
+                velocityY = (event.clientY - lastMouseY) * 0.5;
+                isDragging = false;
+                document.getElementById("circle").style.cursor = "grab";
+                if (!isMoving) {
+                    isMoving = true;
+                    requestAnimationFrame(bounce);
+                }
+            }
+        });
+
         window.addEventListener('resize', () => {
             x = Math.max(0, Math.min(x, window.innerWidth - 100));
             y = Math.max(0, Math.min(y, window.innerHeight - 100));
-        });
-
-        window.addEventListener('mousemove', (event) => {
-            mouseX = event.clientX;
-            mouseY = event.clientY;
         });
     </script>
 </body>
