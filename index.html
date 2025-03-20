@@ -71,12 +71,12 @@
             x += velocityX;
             y += velocityY;
 
-            let distX = mouseX - x;
-            let distY = mouseY - y;
+            let distX = mouseX - (x + radius);
+            let distY = mouseY - (y + radius);
             let distance = Math.sqrt(distX * distX + distY * distY);
-            if (distance < 150) {
+            if (distance <= radius) { // Only push when mouse is on the ball
                 let angle = Math.atan2(distY, distX);
-                let force = (150 - distance) * 0.1;
+                let force = 5; // Adjusted push force
                 velocityX += Math.cos(angle) * force;
                 velocityY += Math.sin(angle) * force;
             }
