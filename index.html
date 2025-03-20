@@ -40,25 +40,15 @@
         <input type="range" id="dampingSlider" min="0" max="0.5" step="0.01" value="0.05">
     </div>
     <script>
-        const socket = new WebSocket('ws://localhost:8080');
         let isMoving = false;
         let x = window.innerWidth / 2;
         let y = window.innerHeight / 2;
         let velocityX = (Math.random() - 0.5) * 10;
         let velocityY = (Math.random() - 0.5) * 10;
         let gravity = 0.5;
-        let radius = 50; // Radius of the circle (half of its width and height)
+        let radius = 50;
         let mouseX = 0;
         let mouseY = 0;
-
-        socket.onmessage = (event) => {
-            let data = JSON.parse(event.data);
-            x = data.x;
-            y = data.y;
-            velocityX = data.velocityX;
-            velocityY = data.velocityY;
-            updateBallPosition();
-        };
 
         function getRandomColor() {
             return `hsl(${Math.random() * 360}, 70%, 60%)`;
@@ -81,18 +71,16 @@
             x += velocityX;
             y += velocityY;
 
-            // Mouse interaction to push the ball
             let distX = mouseX - x;
             let distY = mouseY - y;
             let distance = Math.sqrt(distX * distX + distY * distY);
-            if (distance < 150) { // Only push if the mouse is within 150px of the ball
+            if (distance < 150) {
                 let angle = Math.atan2(distY, distX);
-                let force = (150 - distance) * 0.1; // The closer the mouse, the stronger the force
+                let force = (150 - distance) * 0.1;
                 velocityX += Math.cos(angle) * force;
                 velocityY += Math.sin(angle) * force;
             }
 
-            // Boundaries and bouncing
             if (x <= 0) {
                 velocityX *= -(1 - damping);
                 x = 0;
@@ -113,7 +101,6 @@
             if (Math.abs(velocityY) < 0.1) velocityY = 0;
 
             updateBallPosition();
-            socket.send(JSON.stringify({ x, y, velocityX, velocityY }));
 
             if (velocityX !== 0 || velocityY !== 0) {
                 requestAnimationFrame(bounce);
@@ -133,7 +120,6 @@
             y = Math.max(0, Math.min(y, window.innerHeight - 100));
         });
 
-        // Mouse movement listener
         window.addEventListener('mousemove', (event) => {
             mouseX = event.clientX;
             mouseY = event.clientY;
