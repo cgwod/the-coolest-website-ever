@@ -52,12 +52,8 @@
         let mouseX = 0;
         let mouseY = 0;
 
-        document.addEventListener("DOMContentLoaded", () => {
-            updateBallPosition();
-        });
-
         function bounce() {
-            if (isDragging) return;
+            if (isDragging) return; // Stop physics while dragging
 
             let damping = parseFloat(document.getElementById("dampingSlider").value);
             velocityY += gravity;
@@ -91,6 +87,10 @@
             circle.style.top = y + "px";
         }
 
+        function getRandomColor() {
+            return `hsl(${Math.random() * 360}, 70%, 60%)`;
+        }
+
         document.getElementById("circle").addEventListener("mousedown", (event) => {
             isDragging = true;
             lastMouseX = event.clientX;
@@ -99,6 +99,7 @@
             mouseY = event.clientY - y;
             velocityX = 0;
             velocityY = 0;
+            document.body.style.backgroundColor = getRandomColor();  // Change background color on click
             document.getElementById("circle").style.cursor = "grabbing";
         });
 
